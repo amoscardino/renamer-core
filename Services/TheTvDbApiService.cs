@@ -15,11 +15,22 @@ namespace RenamerCore.Services
         private string _apiKey;
         private string _apiToken;
 
+        /// <summary>
+        /// Creates a new instance of The TV DB API Service
+        /// </summary>
+        /// <param name="configService"></param>
         public TheTvDbApiService(ConfigService configService)
         {
             _apiKey = configService.GetValue("TvDbApiKey");
         }
 
+        /// <summary>
+        /// Searches for a show by name using The TV DB API.
+        /// If any results are found, the first is returned.
+        /// If no results, null is returned.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task<TvdbShow> GetShowAsync(string name)
         {
             await GetApiTokenAsync();
@@ -36,6 +47,15 @@ namespace RenamerCore.Services
             return null;
         }
 
+        /// <summary>
+        /// Attempts to find details of an episode for a given show using The TV DB API.
+        /// Returns null if no episode is found.
+        /// </summary>
+        /// <param name="showId"></param>
+        /// <param name="season"></param>
+        /// <param name="episode"></param>
+        /// <param name="useDvdOrder"></param>
+        /// <returns></returns>
         public async Task<TvdbEpisode> GetEpisodeAsync(long showId, int season, int episode, bool useDvdOrder)
         {
             await GetApiTokenAsync();
@@ -59,6 +79,11 @@ namespace RenamerCore.Services
             return null;
         }
 
+        /// <summary>
+        /// Sets the login token for future API requests for this instance.
+        /// Nothing will happen if the token already exists.await
+        /// </summary>
+        /// <returns></returns>
         private async Task GetApiTokenAsync()
         {
             if (!_apiToken.IsNullOrWhiteSpace())

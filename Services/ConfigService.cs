@@ -11,6 +11,11 @@ namespace RenamerCore.Services
         private const string DIR_NAME = "renamer-core";
         private const string FILE_NAME = "renamer-core.json";
 
+        /// <summary>
+        /// Retrieves a config value for the given key. Returns null if no value exists.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public string GetValue(string key)
         {
             var config = GetConfig();
@@ -21,6 +26,11 @@ namespace RenamerCore.Services
             return null;
         }
 
+        /// <summary>
+        /// Sets a config value for the given key.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void SetValue(string key, string value)
         {
             var config = GetConfig();
@@ -30,6 +40,10 @@ namespace RenamerCore.Services
             SaveConfig(config);
         }
 
+        /// <summary>
+        /// Gets the path to the config file
+        /// </summary>
+        /// <returns></returns>
         private string GetDataPath()
         {
             // Use DoNotVerify in case LocalApplicationData doesn’t exist.
@@ -41,6 +55,10 @@ namespace RenamerCore.Services
             return Path.Combine(appData, FILE_NAME);
         }
 
+        /// <summary>
+        /// Retrieves a dictionary containing all the config values.
+        /// </summary>
+        /// <returns></returns>
         private Dictionary<string, string> GetConfig()
         {
             var dataPath = GetDataPath();
@@ -56,6 +74,10 @@ namespace RenamerCore.Services
             return new Dictionary<string, string>();
         }
 
+        /// <summary>
+        /// Updates the config file with a new set of values from a dictionary.
+        /// </summary>
+        /// <param name="config"></param>
         private void SaveConfig(Dictionary<string, string> config)
         {
             var dataPath = GetDataPath();

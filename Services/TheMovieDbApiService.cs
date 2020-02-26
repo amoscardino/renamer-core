@@ -14,11 +14,22 @@ namespace RenamerCore.Services
 
         private string _apiKey;
 
+        /// <summary>
+        /// Creates a new instance of The Movie DB API Service
+        /// </summary>
+        /// <param name="configService"></param>
         public TheMovieDbApiService(ConfigService configService)
         {
             _apiKey = configService.GetValue("TheMovieDbApiKey");
         }
 
+        /// <summary>
+        /// Searches The Movie DB for a movie by name.
+        /// If any matches are found, the first is returned.
+        /// If no matches, null is returned.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task<TmdbResult> GetMovieAsync(string name)
         {
             var response = await API_URL
