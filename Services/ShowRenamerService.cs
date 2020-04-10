@@ -54,7 +54,7 @@ namespace RenamerCore.Services
 
             if (!files.Any())
                 return;
-                
+
             await MatchFilesAsync(files, outputPath, dvdOrderInput, dvdOrderOutput);
 
             var anyToRename = files.Any(x => !string.IsNullOrWhiteSpace(x.NewPath));
@@ -73,7 +73,7 @@ namespace RenamerCore.Services
 
                 var fileName = Path.GetFileNameWithoutExtension(file.OldPath);
                 var ext = Path.GetExtension(file.OldPath);
-                var regexMatch = Regex.Match(fileName, @"(.+?)s?(\d+)[ex](\d+)", RegexOptions.IgnoreCase);
+                var regexMatch = Regex.Match(fileName, @"(.+?)s?(\d+)[ex](\d+)[ex-]{0,2}(\d+)?", RegexOptions.IgnoreCase);
 
                 if (!regexMatch.Success)
                 {
@@ -92,17 +92,32 @@ namespace RenamerCore.Services
                 }
 
                 var seasonNumber = int.TryParse(regexMatch.Groups[2].Value, out var s) ? s : 0;
-                var episodeNumber = int.TryParse(regexMatch.Groups[3].Value, out var e) ? e : 0;
-                var episode = await FindEpisodeAsync(show.Id, seasonNumber, episodeNumber, dvdOrderInput);
+                var startEpisodeNumber = int.TryParse(regexMatch.Groups[3].Value, out var e) ? e : 0;
+                var startEpisode = await FindEpisodeAsync(show.Id, seasonNumber, startEpisodeNumber, dvdOrderInput);
+                var endEpisode = (TvdbEpisode)null;
 
-                if (episode == null)
+                if (startEpisode == null)
                 {
                     _console.WriteLine($"\tNO MATCH!");
                     _console.WriteLine();
                     continue;
                 }
 
-                var newfilePath = GetNewFilePath(show, episode, ext, dvdOrderOutput);
+                if (regexMatch.Groups[4].Success)
+                {
+                    var endEpisodeNumber = int.TryParse(regexMatch.Groups[4].Value, out var e1) ? e1 : 0;
+
+                    endEpisode = await FindEpisodeAsync(show.Id, seasonNumber, endEpisodeNumber, dvdOrderInput);
+
+                    if (endEpisode == null)
+                    {
+                        _console.WriteLine($"\tNO MATCH!");
+                        _console.WriteLine();
+                        continue;
+                    }
+                }
+
+                var newfilePath = GetNewFilePath(show, startEpisode, endEpisode, ext, dvdOrderOutput);
 
                 file.NewPath = Path.Combine(outputPath, newfilePath);
 
@@ -157,15 +172,26 @@ namespace RenamerCore.Services
             }
         }
 
-        public string GetNewFilePath(TvdbShow show, TvdbEpisode episode, string ext, bool useDvdOrder)
+        public string GetNewFilePath(TvdbShow show, TvdbEpisode startEpisode, TvdbEpisode endEpisode, string ext, bool useDvdOrder)
         {
-            var seasonNumber = useDvdOrder ? episode.DvdSeason ?? episode.AiredSeason : episode.AiredSeason;
-            var episodeNumber = useDvdOrder ? episode.DvdEpisodeNumber ?? episode.AiredEpisodeNumber : episode.AiredEpisodeNumber;
+            var seasonNumber = useDvdOrder ? startEpisode.DvdSeason ?? startEpisode.AiredSeason : startEpisode.AiredSeason;
+            var startEpisodeNumber = useDvdOrder ? startEpisode.DvdEpisodeNumber ?? startEpisode.AiredEpisodeNumber : startEpisode.AiredEpisodeNumber;
 
-            var newFileName = $"{show.SeriesName}";
-            newFileName += $" - s{seasonNumber.PadLeft(2, '0')}e{episodeNumber.PadLeft(2, '0')}";
-            newFileName += $" - {episode.EpisodeName}{ext}";
-            newFileName = newFileName.CleanFileName();
+            var newFileName = $"{show.SeriesName} - s{seasonNumber.PadLeft(2, '0')}e{startEpisodeNumber.PadLeft(2, '0')}";
+
+            if (endEpisode != null)
+            {
+                var endEpisodeNumber = useDvdOrder ? endEpisode.DvdEpisodeNumber ?? endEpisode.AiredEpisodeNumber : endEpisode.AiredEpisodeNumber;
+
+                newFileName += $"-e{endEpisodeNumber.PadLeft(2, '0')}";
+            }
+
+            newFileName += $" - {startEpisode.EpisodeName}";
+
+            if (endEpisode != null)
+                newFileName += $" - {endEpisode.EpisodeName}";
+
+            newFileName = $"{newFileName}{ext}".CleanFileName();
 
             var showFolder = show.SeriesName.CleanPath();
             var seasonFolder = $"Season {seasonNumber}";
