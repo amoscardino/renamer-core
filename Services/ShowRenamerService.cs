@@ -182,7 +182,7 @@ namespace RenamerCore.Services
                 {
                     show = await _tvDbApiService.GetShowByNameAsync(name);
                 }
-                catch (Exception e) { }
+                catch { }
 
                 if (show != null)
                     _cache.Set(cacheKey, show);
