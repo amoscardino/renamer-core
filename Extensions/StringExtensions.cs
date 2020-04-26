@@ -38,8 +38,8 @@ namespace RenamerCore.Extensions
         /// <returns></returns>
         public static string CleanFileName(this string str)
         {
-            // Allowed: letters, numbers, spaces, and any of: ()-&,!%
-            var pattern = @"[^a-zA-Z\d\.\(\)\-\s\&\,\!\%]";
+            // Allowed: letters, numbers, spaces, and any of: ()-&,!%'
+            var pattern = @"[^a-zA-Z\d\.\(\)\-\s\&\,\!\%\']";
 
             return Regex.Replace(str ?? string.Empty, pattern, string.Empty);
         }
@@ -51,8 +51,8 @@ namespace RenamerCore.Extensions
         /// <returns></returns>
         public static string CleanPath(this string str)
         {
-            // Allowed: letters, numbers, spaces, and any of: ()-&,!%
-            var pattern = @"[^a-zA-Z\d\.\(\)\-\s\&\,\!\%]";
+            // Allowed: letters, numbers, spaces, and any of: ()-&,!%'
+            var pattern = @"[^a-zA-Z\d\.\(\)\-\s\&\,\!\%\']";
 
             return Regex.Replace(str ?? string.Empty, pattern, string.Empty);
         }

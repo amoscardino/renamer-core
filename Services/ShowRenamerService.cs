@@ -194,7 +194,7 @@ namespace RenamerCore.Services
             newFileName = $"{newFileName}{ext}".CleanFileName();
 
             var showFolder = show.SeriesName.CleanPath();
-            var seasonFolder = $"Season {seasonNumber}";
+            var seasonFolder = $"Season {seasonNumber.PadLeft(2, '0')}";
 
             return Path.Combine(showFolder, seasonFolder, newFileName);
         }
