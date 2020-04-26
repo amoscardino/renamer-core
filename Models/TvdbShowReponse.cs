@@ -4,6 +4,6 @@ namespace RenamerCore.Models
 {
     public class TvdbShowReponse
     {
-        public List<TvdbShow> Data { get; set; }
+        public TvdbShow Data { get; set; }
     }
 }

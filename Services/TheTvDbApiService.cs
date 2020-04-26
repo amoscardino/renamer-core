@@ -25,13 +25,32 @@ namespace RenamerCore.Services
         }
 
         /// <summary>
+        /// Searches for a show by ID using The TV DB API.
+        /// If any results are found, the first is returned.
+        /// If no results, null is returned.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<TvdbShow> GetShowByIdAsync(int id)
+        {
+            await GetApiTokenAsync();
+
+            var response = await API_URL
+                    .AppendPathSegments("series", id.ToString())
+                    .WithOAuthBearerToken(_apiToken)
+                    .GetJsonAsync<TvdbShowReponse>();
+
+            return response?.Data;
+        }
+
+        /// <summary>
         /// Searches for a show by name using The TV DB API.
         /// If any results are found, the first is returned.
         /// If no results, null is returned.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<TvdbShow> GetShowAsync(string name)
+        public async Task<TvdbShow> GetShowByNameAsync(string name)
         {
             await GetApiTokenAsync();
 
@@ -39,7 +58,7 @@ namespace RenamerCore.Services
                     .AppendPathSegments("search", "series")
                     .SetQueryParams(new { name = name })
                     .WithOAuthBearerToken(_apiToken)
-                    .GetJsonAsync<TvdbShowReponse>();
+                    .GetJsonAsync<TvdbShowSearchReponse>();
 
             if (response != null && response.Data != null && response.Data.Any())
                 return response.Data.First();

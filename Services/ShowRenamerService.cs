@@ -73,7 +73,7 @@ namespace RenamerCore.Services
 
                 var fileName = Path.GetFileNameWithoutExtension(file.OldPath);
                 var ext = Path.GetExtension(file.OldPath);
-                var regexMatch = Regex.Match(fileName, @"(.+?)s?(\d+)[ex](\d+)[ex-]{0,2}(\d+)?", RegexOptions.IgnoreCase);
+                var regexMatch = Regex.Match(fileName, @"(?:\[{2}(\d+)\]{2})?(.+?)s?(\d+)[ex](\d+)[ex-]{0,2}(\d+)?", RegexOptions.IgnoreCase);
 
                 if (!regexMatch.Success)
                 {
@@ -81,8 +81,21 @@ namespace RenamerCore.Services
                     continue;
                 }
 
-                var showName = regexMatch.Groups[1].Value.Clean();
-                var show = await FindShowRecursiveAsync(showName);
+                var show = (TvdbShow)null;
+
+                if (regexMatch.Groups[1].Success)
+                {
+                    var showId = int.TryParse(regexMatch.Groups[1].Value, out var id) ? id : 0;
+
+                    show = await FindShowByIdAsync(showId);
+                }
+
+                if (show == null)
+                {
+                    var showName = regexMatch.Groups[2].Value.Clean();
+
+                    show = await FindShowByNameAsync(showName);
+                }
 
                 if (show == null)
                 {
@@ -91,8 +104,8 @@ namespace RenamerCore.Services
                     continue;
                 }
 
-                var seasonNumber = int.TryParse(regexMatch.Groups[2].Value, out var s) ? s : 0;
-                var startEpisodeNumber = int.TryParse(regexMatch.Groups[3].Value, out var e) ? e : 0;
+                var seasonNumber = int.TryParse(regexMatch.Groups[3].Value, out var s) ? s : 0;
+                var startEpisodeNumber = int.TryParse(regexMatch.Groups[4].Value, out var e) ? e : 0;
                 var startEpisode = await FindEpisodeAsync(show.Id, seasonNumber, startEpisodeNumber, dvdOrderInput);
                 var endEpisode = (TvdbEpisode)null;
 
@@ -103,9 +116,9 @@ namespace RenamerCore.Services
                     continue;
                 }
 
-                if (regexMatch.Groups[4].Success)
+                if (regexMatch.Groups[5].Success)
                 {
-                    var endEpisodeNumber = int.TryParse(regexMatch.Groups[4].Value, out var e1) ? e1 : 0;
+                    var endEpisodeNumber = int.TryParse(regexMatch.Groups[5].Value, out var e1) ? e1 : 0;
 
                     endEpisode = await FindEpisodeAsync(show.Id, seasonNumber, endEpisodeNumber, dvdOrderInput);
 
@@ -126,7 +139,33 @@ namespace RenamerCore.Services
             }
         }
 
-        private async Task<TvdbShow> FindShowRecursiveAsync(string name)
+        private async Task<TvdbShow> FindShowByIdAsync(int id)
+        {
+            if (id == 0)
+                return null;
+
+            if (_verbose)
+                _console.WriteLine($"\t\t* Searching for ID: \"{id}\"");
+
+            var show = (TvdbShow)null;
+            var cacheKey = $"TvdbShowId-{id}";
+
+            if (!_cache.TryGetValue(cacheKey, out show))
+            {
+                try
+                {
+                    show = await _tvDbApiService.GetShowByIdAsync(id);
+                }
+                catch { }
+
+                if (show != null)
+                    _cache.Set(cacheKey, show);
+            }
+
+            return show;
+        }
+
+        private async Task<TvdbShow> FindShowByNameAsync(string name)
         {
             if (name.IsNullOrWhiteSpace())
                 return null;
@@ -141,15 +180,15 @@ namespace RenamerCore.Services
             {
                 try
                 {
-                    show = await _tvDbApiService.GetShowAsync(name);
+                    show = await _tvDbApiService.GetShowByNameAsync(name);
                 }
-                catch { }
+                catch (Exception e) { }
 
                 if (show != null)
                     _cache.Set(cacheKey, show);
             }
 
-            return show ?? await FindShowRecursiveAsync(name.DropLastWord());
+            return show ?? await FindShowByNameAsync(name.DropLastWord());
         }
 
         private async Task<TvdbEpisode> FindEpisodeAsync(long showId, int season, int episode, bool useDvdOrder)
