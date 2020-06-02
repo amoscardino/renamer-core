@@ -73,6 +73,7 @@ For instance, given a file called `doctor.who.2005.s01e01.mkv`, it will be moved
     - Note that files will be **moved** if the input and output directories are not the same.
 - `-di` or `--dvd-input` - Input is DVD Order. Will search the season and episode numbers based on DVD order. If this flag is not use, the season and episode numbers will be searched based on the aired order.
 - `-do` or `dvd-output` - Output is DVD Order. Will use the season and episode numbers based on DVD order for the renamed files. If this flag is not use, the season and episode numbers will be from the aired order.
+- `-f` or `--files-only` - Files Only Mode. Will not create folders for shows or seasons. Only the files will be renamed. They may still be moved to the output directory.
 - `-r` or `--recurse` - Recursive Mode. Will recursively scan all folders and subfolders to find files in the Input Directory.
 - `-y` or `--yes` - Skip Confirmation. If provided, the confirmation prompt before renaming will be skipped. Be aware that files will be renamed (and possibly moved) immediately after matches are made.
 - `--verbose` - Verbose Output. Will show search queries as they are made, as well as other extra output.

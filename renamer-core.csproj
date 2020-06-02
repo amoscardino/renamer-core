@@ -7,7 +7,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>renamer</ToolCommandName>
     <PackageOutputPath>./dist</PackageOutputPath>
-    <Version>2.4.1</Version>
+    <Version>2.5.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

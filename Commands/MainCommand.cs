@@ -1,9 +1,6 @@
 using System;
-using System.Threading.Tasks;
-using McMaster.Extensions.CommandLineUtils;
-using RenamerCore.Services;
-using RenamerCore.Extensions;
 using System.Reflection;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace RenamerCore.Commands
 {

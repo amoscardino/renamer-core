@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
-using RenamerCore.Extensions;
 using RenamerCore.Models;
 
 namespace RenamerCore.Services

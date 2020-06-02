@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using McMaster.Extensions.CommandLineUtils;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Flurl;
-using Flurl.Http;
 using RenamerCore.Models;
 using RenamerCore.Extensions;
 

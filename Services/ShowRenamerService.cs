@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using Flurl;
-using Flurl.Http;
 using RenamerCore.Models;
 using RenamerCore.Extensions;
 using Microsoft.Extensions.Caching.Memory;
@@ -30,7 +28,7 @@ namespace RenamerCore.Services
             _tvDbApiService = tvDbApiService;
         }
 
-        public async Task RenameAsync(string inputPath, string outputPath, bool dvdOrderInput, bool dvdOrderOutput, bool recurse, bool skipConfirmation, bool verbose)
+        public async Task RenameAsync(string inputPath, string outputPath, bool dvdOrderInput, bool dvdOrderOutput, bool filesOnly, bool recurse, bool skipConfirmation, bool verbose)
         {
             _verbose = verbose;
 
@@ -55,7 +53,7 @@ namespace RenamerCore.Services
             if (!files.Any())
                 return;
 
-            await MatchFilesAsync(files, outputPath, dvdOrderInput, dvdOrderOutput);
+            await MatchFilesAsync(files, outputPath, dvdOrderInput, dvdOrderOutput, filesOnly);
 
             var anyToRename = files.Any(x => !string.IsNullOrWhiteSpace(x.NewPath));
 
@@ -65,7 +63,7 @@ namespace RenamerCore.Services
                 _console.WriteLine("Nothing has been changed.");
         }
 
-        private async Task MatchFilesAsync(List<FileMatch> files, string outputPath, bool dvdOrderInput, bool dvdOrderOutput)
+        private async Task MatchFilesAsync(List<FileMatch> files, string outputPath, bool dvdOrderInput, bool dvdOrderOutput, bool filesOnly)
         {
             foreach (var file in files)
             {
@@ -130,7 +128,7 @@ namespace RenamerCore.Services
                     }
                 }
 
-                var newfilePath = GetNewFilePath(show, startEpisode, endEpisode, ext, dvdOrderOutput);
+                var newfilePath = GetNewFilePath(show, startEpisode, endEpisode, ext, dvdOrderOutput, filesOnly);
 
                 file.NewPath = Path.Combine(outputPath, newfilePath);
 
@@ -211,7 +209,7 @@ namespace RenamerCore.Services
             }
         }
 
-        public string GetNewFilePath(TvdbShow show, TvdbEpisode startEpisode, TvdbEpisode endEpisode, string ext, bool useDvdOrder)
+        public string GetNewFilePath(TvdbShow show, TvdbEpisode startEpisode, TvdbEpisode endEpisode, string ext, bool useDvdOrder, bool filesOnly)
         {
             var seasonNumber = useDvdOrder ? startEpisode.DvdSeason ?? startEpisode.AiredSeason : startEpisode.AiredSeason;
             var startEpisodeNumber = useDvdOrder ? startEpisode.DvdEpisodeNumber ?? startEpisode.AiredEpisodeNumber : startEpisode.AiredEpisodeNumber;
@@ -231,6 +229,9 @@ namespace RenamerCore.Services
                 newFileName += $" - {endEpisode.EpisodeName}";
 
             newFileName = $"{newFileName}{ext}".CleanFileName();
+
+            if (filesOnly)
+                return newFileName;
 
             var showFolder = show.SeriesName.CleanPath();
             var seasonFolder = $"Season {seasonNumber.PadLeft(2, '0')}";

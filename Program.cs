@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,19 +11,26 @@ namespace RenamerCore
     {
         private static async Task Main(string[] args)
         {
-            await Host
-                .CreateDefaultBuilder()
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddMemoryCache();
-                    services.AddTransient<FileService>();
-                    services.AddTransient<ConfigService>();
-                    services.AddTransient<TheMovieDbApiService>();
-                    services.AddTransient<TheTvDbApiService>();
-                    services.AddTransient<MovieRenamerService>();
-                    services.AddTransient<ShowRenamerService>();
-                })
-                .RunCommandLineApplicationAsync<MainCommand>(args);
+            try
+            {
+                await Host
+                    .CreateDefaultBuilder()
+                    .ConfigureServices((context, services) =>
+                    {
+                        services.AddMemoryCache();
+                        services.AddTransient<FileService>();
+                        services.AddTransient<ConfigService>();
+                        services.AddTransient<TheMovieDbApiService>();
+                        services.AddTransient<TheTvDbApiService>();
+                        services.AddTransient<MovieRenamerService>();
+                        services.AddTransient<ShowRenamerService>();
+                    })
+                    .RunCommandLineApplicationAsync<MainCommand>(args);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }

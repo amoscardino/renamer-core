@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using RenamerCore.Services;
-using RenamerCore.Extensions;
 
 namespace RenamerCore.Commands
 {
@@ -28,12 +27,15 @@ namespace RenamerCore.Commands
         [Option("-do|--dvd-output", "DVD Order Output. Outputs files using season and episode numbers as DVD order instead of aired order.", CommandOptionType.NoValue)]
         public bool DvdOrderOutput { get; set; }
 
+        [Option("-f|--files-only", "Files Only. Will not create folders for shows or seasons and will only rename the files.", CommandOptionType.NoValue)]
+        public bool FilesOnly { get; set; }
+
         [Option("-r|--recurse", "Recursive search. Will scan folders and subfolders of the Input Path.", CommandOptionType.NoValue)]
         public bool Recurse { get; set; }
 
         private async Task OnExecuteAsync(CommandLineApplication application, IConsole console, ShowRenamerService showRenamer)
         {
-            await showRenamer.RenameAsync(InputPath, OutputPath, DvdOrderInput, DvdOrderOutput, Recurse, SkipConfirmation, Verbose);
+            await showRenamer.RenameAsync(InputPath, OutputPath, DvdOrderInput, DvdOrderOutput, FilesOnly, Recurse, SkipConfirmation, Verbose);
         }
     }
 }
