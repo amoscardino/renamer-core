@@ -16,7 +16,7 @@ namespace RenamerCore.Commands
         [Option("-o|--output <PATH>", "Output path. Defaults to input path.", CommandOptionType.SingleValue)]
         public string OutputPath { get; set; }
 
-        [Option("-y", "Skip confirmation prompt. Be careful as files will be renamed immediately.", CommandOptionType.NoValue)]
+        [Option("-y|--yes", "Skip confirmation prompt. Be careful as files will be renamed immediately.", CommandOptionType.NoValue)]
         public bool SkipConfirmation { get; set; }
 
         [Option("--verbose", "Verbose output.", CommandOptionType.NoValue)]

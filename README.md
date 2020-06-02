@@ -18,7 +18,7 @@ To install:
 ```cmd
 > dotnet build
 > dotnet pack
-> dotnet tooll install -g --add-source ./dist renamer-core
+> dotnet tool install -g --add-source ./dist renamer-core
 ```
 
 ## Usage
@@ -51,7 +51,7 @@ For instance, given a file called `star.wars.1977.h264.foo.bar.mkv`, it will mat
 - `-i <PATH>` or `--input <PATH>` - Input Directory. Defaults to current directory.
 - `-o <PATH>` or `--output <PATH>` - Output Directory. Defaults to the input directory.
     - Note that files will be **moved** if the input and output directories are not the same.
-- `-y` - Skip Confirmation. If provided, the confirmation prompt before renaming will be skipped. Be aware that files will be renamed (and possibly moved) immediately after matches are made.
+- `-y` or `--yes` - Skip Confirmation. If provided, the confirmation prompt before renaming will be skipped. Be aware that files will be renamed (and possibly moved) immediately after matches are made.
 - `--verbose` - Verbose Output. Will show search queries as they are made, as well as other extra output.
 
 ### Show Renamer
@@ -71,8 +71,8 @@ For instance, given a file called `doctor.who.2005.s01e01.mkv`, it will be moved
 - `-i <PATH>` or `--input <PATH>` - Input Directory. Defaults to current directory.
 - `-o <PATH>` or `--output <PATH>` - Output Directory. Defaults to the input directory.
     - Note that files will be **moved** if the input and output directories are not the same.
-- `-di` - Input is DVD Order. Will search the season and episode numbers based on DVD order. If this flag is not use, the season and episode numbers will be searched based on the aired order.
-- `-do` - Output is DVD Order. Will use the season and episode numbers based on DVD order for the renamed files. If this flag is not use, the season and episode numbers will be from the aired order.
-- `-r` - Recursive Mode. Will recursively scan all folders and subfolders to find files in the Input Directory.
-- `-y` - Skip Confirmation. If provided, the confirmation prompt before renaming will be skipped. Be aware that files will be renamed (and possibly moved) immediately after matches are made.
+- `-di` or `--dvd-input` - Input is DVD Order. Will search the season and episode numbers based on DVD order. If this flag is not use, the season and episode numbers will be searched based on the aired order.
+- `-do` or `dvd-output` - Output is DVD Order. Will use the season and episode numbers based on DVD order for the renamed files. If this flag is not use, the season and episode numbers will be from the aired order.
+- `-r` or `--recurse` - Recursive Mode. Will recursively scan all folders and subfolders to find files in the Input Directory.
+- `-y` or `--yes` - Skip Confirmation. If provided, the confirmation prompt before renaming will be skipped. Be aware that files will be renamed (and possibly moved) immediately after matches are made.
 - `--verbose` - Verbose Output. Will show search queries as they are made, as well as other extra output.
