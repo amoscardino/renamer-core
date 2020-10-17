@@ -33,6 +33,7 @@ namespace RenamerCore.Services
         {
             var files = Directory
                     .EnumerateFiles(inputDirectory, "*.*", recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
+                    .Where(path => !Path.GetFileName(path).StartsWith('.'))
                     .Select(path => new FileMatch { OldPath = path })
                     .OrderBy(match => match.OldPath)
                     .ToList();
