@@ -55,7 +55,7 @@ namespace RenamerCore.Services
 
             await MatchFilesAsync(files, outputPath, dvdOrderInput, dvdOrderOutput, filesOnly);
 
-            var anyToRename = files.Any(x => !string.IsNullOrWhiteSpace(x.NewPath));
+            var anyToRename = files.Any(match => !match.NewPath.IsNullOrWhiteSpace());
 
             if (anyToRename && (skipConfirmation || Prompt.GetYesNo("Look good?", true)))
                 _fileService.RenameFiles(files);

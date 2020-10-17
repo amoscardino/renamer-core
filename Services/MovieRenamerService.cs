@@ -52,7 +52,7 @@ namespace RenamerCore.Services
 
             await MatchFilesAsync(files, outputPath);
 
-            var anyToRename = files.Any(x => !x.NewPath.IsNullOrWhiteSpace());
+            var anyToRename = files.Any(match => !match.NewPath.IsNullOrWhiteSpace());
 
             if (anyToRename && (skipConfirmation || Prompt.GetYesNo("Look good?", true)))
                 _fileService.RenameFiles(files);

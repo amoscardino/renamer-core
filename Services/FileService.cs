@@ -32,9 +32,10 @@ namespace RenamerCore.Services
         public List<FileMatch> GetFiles(string inputDirectory, bool recurse = false)
         {
             var files = Directory
-                .GetFiles(inputDirectory, "*.*", recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
-                .Select(x => new FileMatch { OldPath = x })
-                .ToList();
+                    .EnumerateFiles(inputDirectory, "*.*", recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
+                    .Select(path => new FileMatch { OldPath = path })
+                    .OrderBy(match => match.OldPath)
+                    .ToList();
 
             _console.WriteLine($"Found {files.Count} files.");
             _console.WriteLine();
@@ -59,7 +60,7 @@ namespace RenamerCore.Services
                 File.Move(file.OldPath, file.NewPath);
             }
 
-            _console.WriteLine($"Renamed {files.Count(x => !x.NewPath.IsNullOrWhiteSpace())} files.");
+            _console.WriteLine($"Renamed {files.Count(match => !match.NewPath.IsNullOrWhiteSpace())} files.");
         }
     }
 }
