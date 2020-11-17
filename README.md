@@ -5,6 +5,8 @@ Command line tool for renaming movie and show files for Plex.
 
 ## Installation
 
+> Requires [.NET 5](https://dotnet.microsoft.com/download/dotnet/5.0)
+
 Clone the repo to you computer. Pull to get updates. Open a command prompt to the source directory.
 
 If you are updating, remove the old version first:
