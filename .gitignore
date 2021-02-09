@@ -1,16 +1,15 @@
 
-# Created by https://www.gitignore.io/api/linux,windows,dotnetcore,visualstudiocode
-# Edit at https://www.gitignore.io/?templates=linux,windows,dotnetcore,visualstudiocode
+# Created by https://www.toptal.com/developers/gitignore/api/linux,windows,dotnetcore,visualstudiocode,macos
+# Edit at https://www.toptal.com/developers/gitignore?templates=linux,windows,dotnetcore,visualstudiocode,macos
 
 ### DotnetCore ###
 # .NET Core build folders
-/bin
-/obj
+bin/
+obj/
 
 # Common node modules locations
 /node_modules
 /wwwroot/node_modules
-
 
 ### Linux ###
 *~
@@ -27,16 +26,45 @@
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
 ### VisualStudioCode ###
 .vscode/*
-!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
-!.vscode/extensions.json
+*.code-workspace
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
+.ionide
 
 ### Windows ###
 # Windows thumbnail cache files
@@ -64,7 +92,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.gitignore.io/api/linux,windows,dotnetcore,visualstudiocode
+# End of https://www.toptal.com/developers/gitignore/api/linux,windows,dotnetcore,visualstudiocode,macos
 
 /dist
 /testfiles
