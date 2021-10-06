@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace RenamerCore.Models
 {
-    public class TmdbResult
+    public class Movie
     {
         public long Id { get; set; }
 

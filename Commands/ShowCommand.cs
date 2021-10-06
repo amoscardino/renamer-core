@@ -1,11 +1,10 @@
-using System;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using RenamerCore.Services;
 
 namespace RenamerCore.Commands
 {
-    [Command("s", FullName = "Show Renamer", Description = "Renames show episode files based on TvDB searches.")]
+    [Command("s", FullName = "Show Renamer", Description = "Renames show episode files based on The Movie DB searches.")]
     [HelpOption]
     public class ShowCommand
     {
@@ -21,12 +20,6 @@ namespace RenamerCore.Commands
         [Option("--verbose", "Verbose output.", CommandOptionType.NoValue)]
         public bool Verbose { get; set; }
 
-        [Option("-di|--dvd-input", "Input is DVD Order. Reads season and episode numbers as DVD order instead of aired order.", CommandOptionType.NoValue)]
-        public bool DvdOrderInput { get; set; }
-
-        [Option("-do|--dvd-output", "DVD Order Output. Outputs files using season and episode numbers as DVD order instead of aired order.", CommandOptionType.NoValue)]
-        public bool DvdOrderOutput { get; set; }
-
         [Option("-f|--files-only", "Files Only. Will not create folders for shows or seasons and will only rename the files.", CommandOptionType.NoValue)]
         public bool FilesOnly { get; set; }
 
@@ -34,8 +27,6 @@ namespace RenamerCore.Commands
         public bool Recurse { get; set; }
 
         private async Task OnExecuteAsync(CommandLineApplication application, IConsole console, ShowRenamerService showRenamer)
-        {
-            await showRenamer.RenameAsync(InputPath, OutputPath, DvdOrderInput, DvdOrderOutput, FilesOnly, Recurse, SkipConfirmation, Verbose);
-        }
+            => await showRenamer.RenameAsync(InputPath, OutputPath, FilesOnly, Recurse, SkipConfirmation, Verbose);
     }
 }

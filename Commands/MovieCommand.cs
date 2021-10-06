@@ -1,11 +1,10 @@
-using System;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using RenamerCore.Services;
 
 namespace RenamerCore.Commands
 {
-    [Command("m", FullName = "Movie Renamer", Description = "Renames movie files based on TMDB searches.")]
+    [Command("m", FullName = "Movie Renamer", Description = "Renames movie files based on The Movie DB searches.")]
     [HelpOption]
     public class MovieCommand
     {

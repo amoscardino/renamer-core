@@ -21,7 +21,6 @@ namespace RenamerCore
                         services.AddTransient<FileService>();
                         services.AddTransient<ConfigService>();
                         services.AddTransient<TheMovieDbApiService>();
-                        services.AddTransient<TheTvDbApiService>();
                         services.AddTransient<MovieRenamerService>();
                         services.AddTransient<ShowRenamerService>();
                     })

@@ -8,6 +8,7 @@ using McMaster.Extensions.CommandLineUtils;
 using RenamerCore.Models;
 using RenamerCore.Extensions;
 using Microsoft.Extensions.Caching.Memory;
+using System.Text;
 
 namespace RenamerCore.Services
 {
@@ -16,19 +17,19 @@ namespace RenamerCore.Services
         private IMemoryCache _cache;
         private IConsole _console;
         private FileService _fileService;
-        private TheTvDbApiService _tvDbApiService;
+        private TheMovieDbApiService _tmdbApiService;
 
         private bool _verbose;
 
-        public ShowRenamerService(IMemoryCache cache, IConsole console, FileService fileService, TheTvDbApiService tvDbApiService)
+        public ShowRenamerService(IMemoryCache cache, IConsole console, FileService fileService, TheMovieDbApiService tmdbApiService)
         {
             _cache = cache;
             _console = console;
             _fileService = fileService;
-            _tvDbApiService = tvDbApiService;
+            _tmdbApiService = tmdbApiService;
         }
 
-        public async Task RenameAsync(string inputPath, string outputPath, bool dvdOrderInput, bool dvdOrderOutput, bool filesOnly, bool recurse, bool skipConfirmation, bool verbose)
+        public async Task RenameAsync(string inputPath, string outputPath, bool filesOnly, bool recurse, bool skipConfirmation, bool verbose)
         {
             _verbose = verbose;
 
@@ -53,7 +54,7 @@ namespace RenamerCore.Services
             if (!files.Any())
                 return;
 
-            await MatchFilesAsync(files, outputPath, dvdOrderInput, dvdOrderOutput, filesOnly);
+            await MatchFilesAsync(files, outputPath, filesOnly);
 
             var anyToRename = files.Any(match => !match.NewPath.IsNullOrWhiteSpace());
 
@@ -63,7 +64,7 @@ namespace RenamerCore.Services
                 _console.WriteLine("Nothing has been changed.");
         }
 
-        private async Task MatchFilesAsync(List<FileMatch> files, string outputPath, bool dvdOrderInput, bool dvdOrderOutput, bool filesOnly)
+        private async Task MatchFilesAsync(List<FileMatch> files, string outputPath, bool filesOnly)
         {
             foreach (var file in files)
             {
@@ -79,7 +80,7 @@ namespace RenamerCore.Services
                     continue;
                 }
 
-                var show = (TvdbShow)null;
+                var show = (Show)null;
 
                 if (regexMatch.Groups[1].Success)
                 {
@@ -104,8 +105,8 @@ namespace RenamerCore.Services
 
                 var seasonNumber = int.TryParse(regexMatch.Groups[3].Value, out var s) ? s : 0;
                 var startEpisodeNumber = int.TryParse(regexMatch.Groups[4].Value, out var e) ? e : 0;
-                var startEpisode = await FindEpisodeAsync(show.Id, seasonNumber, startEpisodeNumber, dvdOrderInput);
-                var endEpisode = (TvdbEpisode)null;
+                var startEpisode = await FindEpisodeAsync(show.Id, seasonNumber, startEpisodeNumber);
+                var endEpisode = (Episode)null;
 
                 if (startEpisode == null)
                 {
@@ -118,7 +119,7 @@ namespace RenamerCore.Services
                 {
                     var endEpisodeNumber = int.TryParse(regexMatch.Groups[5].Value, out var e1) ? e1 : 0;
 
-                    endEpisode = await FindEpisodeAsync(show.Id, seasonNumber, endEpisodeNumber, dvdOrderInput);
+                    endEpisode = await FindEpisodeAsync(show.Id, seasonNumber, endEpisodeNumber);
 
                     if (endEpisode == null)
                     {
@@ -128,7 +129,7 @@ namespace RenamerCore.Services
                     }
                 }
 
-                var newfilePath = GetNewFilePath(show, startEpisode, endEpisode, ext, dvdOrderOutput, filesOnly);
+                var newfilePath = GetNewFilePath(show, startEpisode, endEpisode, ext, filesOnly);
 
                 file.NewPath = Path.Combine(outputPath, newfilePath);
 
@@ -137,7 +138,7 @@ namespace RenamerCore.Services
             }
         }
 
-        private async Task<TvdbShow> FindShowByIdAsync(int id)
+        private async Task<Show> FindShowByIdAsync(int id)
         {
             if (id == 0)
                 return null;
@@ -145,14 +146,14 @@ namespace RenamerCore.Services
             if (_verbose)
                 _console.WriteLine($"\t\t* Searching for ID: \"{id}\"");
 
-            var show = (TvdbShow)null;
-            var cacheKey = $"TvdbShowId-{id}";
+            var show = (Show)null;
+            var cacheKey = $"TmdbShowId-{id}";
 
             if (!_cache.TryGetValue(cacheKey, out show))
             {
                 try
                 {
-                    show = await _tvDbApiService.GetShowByIdAsync(id);
+                    show = await _tmdbApiService.GetShowByIdAsync(id);
                 }
                 catch { }
 
@@ -163,7 +164,7 @@ namespace RenamerCore.Services
             return show;
         }
 
-        private async Task<TvdbShow> FindShowByNameAsync(string name)
+        private async Task<Show> FindShowByNameAsync(string name)
         {
             if (name.IsNullOrWhiteSpace())
                 return null;
@@ -171,14 +172,14 @@ namespace RenamerCore.Services
             if (_verbose)
                 _console.WriteLine($"\t\t* Searching for: \"{name}\"");
 
-            var show = (TvdbShow)null;
-            var cacheKey = $"TvdbShow-{name}";
+            var show = (Show)null;
+            var cacheKey = $"TmdbShow-{name}";
 
             if (!_cache.TryGetValue(cacheKey, out show))
             {
                 try
                 {
-                    show = await _tvDbApiService.GetShowByNameAsync(name);
+                    show = await _tmdbApiService.GetShowAsync(name);
                 }
                 catch { }
 
@@ -189,19 +190,14 @@ namespace RenamerCore.Services
             return show ?? await FindShowByNameAsync(name.DropLastWord());
         }
 
-        private async Task<TvdbEpisode> FindEpisodeAsync(long showId, int season, int episode, bool useDvdOrder)
+        private async Task<Episode> FindEpisodeAsync(long showId, int season, int episode)
         {
             try
             {
                 if (_verbose)
-                {
                     _console.WriteLine($"\t\t* Searching for: Show: {showId}, Season: {season}, Episode: {episode}.");
 
-                    if (useDvdOrder)
-                        _console.WriteLine($"\t\t* Using DVD Ordering.");
-                }
-
-                return await _tvDbApiService.GetEpisodeAsync(showId, season, episode, useDvdOrder);
+                return await _tmdbApiService.GetEpisodeAsync(showId, season, episode);
             }
             catch
             {
@@ -209,32 +205,39 @@ namespace RenamerCore.Services
             }
         }
 
-        public string GetNewFilePath(TvdbShow show, TvdbEpisode startEpisode, TvdbEpisode endEpisode, string ext, bool useDvdOrder, bool filesOnly)
+        public string GetNewFilePath(Show show, Episode startEpisode, Episode endEpisode, string ext, bool filesOnly)
         {
-            var seasonNumber = useDvdOrder ? startEpisode.DvdSeason ?? startEpisode.AiredSeason : startEpisode.AiredSeason;
-            var startEpisodeNumber = useDvdOrder ? startEpisode.DvdEpisodeNumber ?? startEpisode.AiredEpisodeNumber : startEpisode.AiredEpisodeNumber;
-
-            var newFileName = $"{show.SeriesName} - s{seasonNumber.PadLeft(2, '0')}e{startEpisodeNumber.PadLeft(2, '0')}";
+            var sb = new StringBuilder();
+            sb.Append(show.Name);
+            sb.Append(" - s");
+            sb.Append(startEpisode.SeasonNumber.ToString().PadLeft(2, '0'));
+            sb.Append("e");
+            sb.Append(startEpisode.EpisodeNumber.ToString().PadLeft(2, '0'));
 
             if (endEpisode != null)
             {
-                var endEpisodeNumber = useDvdOrder ? endEpisode.DvdEpisodeNumber ?? endEpisode.AiredEpisodeNumber : endEpisode.AiredEpisodeNumber;
-
-                newFileName += $"-e{endEpisodeNumber.PadLeft(2, '0')}";
+                sb.Append("-e");
+                sb.Append(endEpisode.EpisodeNumber.ToString().PadLeft(2, '0'));
             }
 
-            newFileName += $" - {startEpisode.EpisodeName}";
+            sb.Append(" - ");
+            sb.Append(startEpisode.Name);
 
             if (endEpisode != null)
-                newFileName += $" - {endEpisode.EpisodeName}";
+            {
+                sb.Append(" - ");
+                sb.Append(endEpisode.Name);
+            }
 
-            newFileName = $"{newFileName}{ext}".CleanFileName();
+            sb.Append(ext);
+
+            var newFileName = sb.ToString().CleanFileName();
 
             if (filesOnly)
                 return newFileName;
 
-            var showFolder = show.SeriesName.CleanPath();
-            var seasonFolder = $"Season {seasonNumber.PadLeft(2, '0')}";
+            var showFolder = show.Name.CleanPath();
+            var seasonFolder = $"Season {startEpisode.SeasonNumber.ToString().PadLeft(2, '0')}";
 
             return Path.Combine(showFolder, seasonFolder, newFileName);
         }

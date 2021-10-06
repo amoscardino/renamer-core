@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using RenamerCore.Models;
 using RenamerCore.Extensions;
+using System.Text;
 
 namespace RenamerCore.Services
 {
@@ -86,7 +87,7 @@ namespace RenamerCore.Services
             }
         }
 
-        private async Task<TmdbResult> FindMovieRecursiveAsync(string name)
+        private async Task<Movie> FindMovieRecursiveAsync(string name)
         {
             if (_verbose)
                 _console.WriteLine($"\t\t* Searching for: \"{name}\"");
@@ -106,22 +107,24 @@ namespace RenamerCore.Services
             return await FindMovieRecursiveAsync(name.DropLastWord());
         }
 
-        private string GetNewFileName(TmdbResult movie, string oldFileName, string ext)
+        private string GetNewFileName(Movie movie, string oldFileName, string ext)
         {
-            var newFileName = $"{movie.Title} ({movie.ReleaseDate.Year})";
+            var sb = new StringBuilder();
+            sb.Append(movie.Title);
+            sb.AppendFormat("({0})", movie.ReleaseDate.Year);
 
             if (Regex.IsMatch(oldFileName, @"4k|2160|uhd", RegexOptions.IgnoreCase))
-                newFileName += " - 4k";
+                sb.Append(" - 4k");
 
             if (Regex.IsMatch(oldFileName, @"1080", RegexOptions.IgnoreCase))
-                newFileName += " - 1080p";
+                sb.Append(" - 1080p");
 
             if (Regex.IsMatch(ext, @"srt|sub", RegexOptions.IgnoreCase))
-                newFileName += ".en";
+                sb.Append(".en");
 
-            newFileName += ext;
+            sb.Append(ext);
 
-            return newFileName.CleanFileName();
+            return sb.ToString().CleanFileName();
         }
     }
 }

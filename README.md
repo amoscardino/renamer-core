@@ -1,7 +1,7 @@
 
 # Renamer Core
 
-Command line tool for renaming movie and show files for Plex.
+Command line tool to rename movie and show files for Plex.
 
 ## Installation
 
@@ -29,10 +29,9 @@ There are 3 commands: `config`, `m`, and `s`. The last two are the Movie Renamer
 
 ### The  `config` command
 
-The `config` command is used to set the API keys for The TV DB API and The Movie DB API. You will need to get your own API keys.
+The `config` command is used to set the API key for The Movie DB API. You will need to get your own API key.
 
 ```bash
-> renamer config -tvdb <APIKEY>
 > renamer config -tmdb <APIKEY>
 ```
 
@@ -52,7 +51,7 @@ For instance, given a file called `star.wars.1977.h264.foo.bar.mkv`, it will mat
 
 - `-i <PATH>` or `--input <PATH>` - Input Directory. Defaults to current directory.
 - `-o <PATH>` or `--output <PATH>` - Output Directory. Defaults to the input directory.
-    - Note that files will be **moved** if the input and output directories are not the same.
+  - Note that files will be **moved** if the input and output directories are not the same.
 - `-y` or `--yes` - Skip Confirmation. If provided, the confirmation prompt before renaming will be skipped. Be aware that files will be renamed (and possibly moved) immediately after matches are made.
 - `--verbose` - Verbose Output. Will show search queries as they are made, as well as other extra output.
 
@@ -62,19 +61,17 @@ For instance, given a file called `star.wars.1977.h264.foo.bar.mkv`, it will mat
 renamer s [OPTIONS]
 ```
 
-The Show Renamer looks for any files in the input directly, attempts to match the show/season/episode to The TV DB, then moves the files to a folder structure that Plex likes.
+The Show Renamer looks for any files in the input directly, attempts to match the show/season/episode to The Movie DB, then moves the files to a folder structure that Plex likes.
 
-For instance, given a file called `doctor.who.2005.s01e01.mkv`, it will be moved to `Doctor Who (2005)\Season 01\Doctor Who (2005) - s01e01 - Rose.mkv`. In order for the episode to be matched correctly, the season and episode must be in the file name using `sXXeYY` or `YYxZZ`. Any text before the season/episode info is considered to be the show name and is searched against The TV DB using a similar algorithm to the movie renamer.
+For instance, given a file called `doctor.who.2005.s01e01.mkv`, it will be moved to `Doctor Who (2005)\Season 01\Doctor Who (2005) - s01e01 - Rose.mkv`. In order for the episode to be matched correctly, the season and episode must be in the file name using `sXXeYY` or `YYxZZ`. Any text before the season/episode info is considered to be the show name and is searched against The Movie DB using a similar algorithm to the movie renamer.
 
-> NEW! In 2.4+, you can now prepend the show ID from The TV DB to the beginning of the filename. Wrap it in double-square brackets to override the show name search. For example, you can name the file something like `[[311711]]the.good.place.s01e01` to have the show matched directly based on the ID `311711`. This can be helpful for shows which do not match well with only their name (like The Good Place).
+> NEW! In 2.4+, you can now prepend the show ID from The Movie DB to the beginning of the filename. Wrap it in double-square brackets to override the show name search. For example, you can name the file something like `[[12345]]some.show.name.s01e01.mkv` to have the show matched directly based on the ID `12345`.
 
 #### Show Renamer Options
 
 - `-i <PATH>` or `--input <PATH>` - Input Directory. Defaults to current directory.
 - `-o <PATH>` or `--output <PATH>` - Output Directory. Defaults to the input directory.
-    - Note that files will be **moved** if the input and output directories are not the same.
-- `-di` or `--dvd-input` - Input is DVD Order. Will search the season and episode numbers based on DVD order. If this flag is not use, the season and episode numbers will be searched based on the aired order.
-- `-do` or `dvd-output` - Output is DVD Order. Will use the season and episode numbers based on DVD order for the renamed files. If this flag is not use, the season and episode numbers will be from the aired order.
+  - Note that files will be **moved** if the input and output directories are not the same.
 - `-f` or `--files-only` - Files Only Mode. Will not create folders for shows or seasons. Only the files will be renamed. They may still be moved to the output directory.
 - `-r` or `--recurse` - Recursive Mode. Will recursively scan all folders and subfolders to find files in the Input Directory.
 - `-y` or `--yes` - Skip Confirmation. If provided, the confirmation prompt before renaming will be skipped. Be aware that files will be renamed (and possibly moved) immediately after matches are made.

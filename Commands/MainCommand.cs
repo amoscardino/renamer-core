@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
 
@@ -6,7 +5,7 @@ namespace RenamerCore.Commands
 {
     [Command(Name = "renamer",
              FullName = "Renamer Core",
-             Description = "Renamer for movies and shows for Plex.")]
+             Description = "Renamer of movies and shows for Plex.")]
     [HelpOption]
     [VersionOptionFromMember(MemberName = "GetVersion")]
     [Subcommand(typeof(RenamerCore.Commands.ConfigCommand),
