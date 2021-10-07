@@ -208,7 +208,13 @@ namespace RenamerCore.Services
         public string GetNewFilePath(Show show, Episode startEpisode, Episode endEpisode, string ext, bool filesOnly)
         {
             var sb = new StringBuilder();
-            sb.Append(show.Name);
+            var showName = show.Name;
+
+            if (show.FirstAirDate != null)
+                showName += $" ({show.FirstAirDate:yyyy})";
+
+            sb.Append(showName);
+
             sb.Append(" - s");
             sb.Append(startEpisode.SeasonNumber.ToString().PadLeft(2, '0'));
             sb.Append("e");
@@ -236,7 +242,7 @@ namespace RenamerCore.Services
             if (filesOnly)
                 return newFileName;
 
-            var showFolder = show.Name.CleanPath();
+            var showFolder = showName.CleanPath();
             var seasonFolder = $"Season {startEpisode.SeasonNumber.ToString().PadLeft(2, '0')}";
 
             return Path.Combine(showFolder, seasonFolder, newFileName);
