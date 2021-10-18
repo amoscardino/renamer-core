@@ -111,7 +111,7 @@ namespace RenamerCore.Services
         {
             var sb = new StringBuilder();
             sb.Append(movie.Title);
-            sb.AppendFormat("({0})", movie.ReleaseDate.Year);
+            sb.AppendFormat(" ({0})", movie.ReleaseDate.Year);
 
             if (Regex.IsMatch(oldFileName, @"4k|2160|uhd", RegexOptions.IgnoreCase))
                 sb.Append(" - 4k");
