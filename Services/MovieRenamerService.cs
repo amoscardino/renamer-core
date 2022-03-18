@@ -104,7 +104,17 @@ namespace RenamerCore.Services
             }
             catch { }
 
-            return await FindMovieRecursiveAsync(name.DropLastWord());
+            //check if the title has [year - title] format. (1900 - 2099)
+            string pattern = @"^[1,2]{1}[9,0]{1}\d{2}\s\-\s.+";
+            RegexOptions options = RegexOptions.Singleline;
+            Match m = Regex.Match(name, pattern, options);
+            Boolean foundYearFormat = m.Success;
+            if(foundYearFormat){
+                return await FindMovieRecursiveAsync(name.DropFirstWord());
+            }else{
+                
+                return await FindMovieRecursiveAsync(name.DropLastWord());
+            }
         }
 
         private string GetNewFileName(Movie movie, string oldFileName, string ext)

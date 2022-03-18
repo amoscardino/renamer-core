@@ -74,5 +74,24 @@ namespace RenamerCore.Extensions
             // Drop the last word.
             return string.Join(" ", words.Take(words.Length - 1));
         }
+
+        /// <summary>
+        /// Returns a new string that matches the input string, but with the first word removed.
+        /// If there is only one word, then an empty string is returned.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string DropFirstWord(this string str)
+        {
+            // Split the string into words
+            var words = (str ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            // If we only have 1 word, return nothing as we can't do any more.
+            if (words.Length <= 1)
+                return string.Empty;
+
+            // Drop the first word.
+            return string.Join(" ", words.Skip(1));
+        }
     }
 }
