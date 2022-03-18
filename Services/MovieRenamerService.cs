@@ -105,13 +105,10 @@ namespace RenamerCore.Services
             catch { }
 
             //check if the title has [year - title] format. (1900 - 2099)
-            string pattern = @"^[1,2]{1}[9,0]{1}\d{2}\s\-\s.+";
+            string pattern = @"^[1,2]{1}[9,0]{1}\d{2}\s.+";
             RegexOptions options = RegexOptions.Singleline;
             Match m = Regex.Match(name, pattern, options);
-            Boolean foundYearFormat = m.Success;
-            _console.WriteLine(m.Value);
-            _console.WriteLine(m.Success);
-            if(foundYearFormat){
+            if(m.Success){
                 return await FindMovieRecursiveAsync(name.DropFirstWord());
             }else{
                 
