@@ -109,6 +109,8 @@ namespace RenamerCore.Services
             RegexOptions options = RegexOptions.Singleline;
             Match m = Regex.Match(name, pattern, options);
             Boolean foundYearFormat = m.Success;
+            _console.WriteLine(m.Value);
+            _console.WriteLine(m.Success);
             if(foundYearFormat){
                 return await FindMovieRecursiveAsync(name.DropFirstWord());
             }else{
