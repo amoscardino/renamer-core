@@ -105,7 +105,7 @@ namespace RenamerCore.Services
             catch { }
 
             //check if the title has [year - title] format. (1900 - 2099)
-            string pattern = @"^[1,2]{1}[9,0]{1}\d{2}\s.+";
+            string pattern = @"^[1,2]{1}[9,0]{1}\d{2}\s{1,}[A-Z,a-z]+.*";
             RegexOptions options = RegexOptions.Singleline;
             Match m = Regex.Match(name, pattern, options);
             if(m.Success){
