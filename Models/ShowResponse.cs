@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 
-namespace RenamerCore.Models
+namespace RenamerCore.Models;
+
+public class ShowResponse
 {
-    public class ShowResponse
-    {
-        public List<Show> Results { get; set; }
-    }
+    public List<Show> Results { get; set; }
 }

@@ -1,9 +1,8 @@
 
-namespace RenamerCore.Models
+namespace RenamerCore.Models;
+
+public class FileMatch
 {
-    public class FileMatch
-    {
-        public string OldPath { get; set; }
-        public string NewPath { get; set; }
-    }
+    public string OldPath { get; set; }
+    public string NewPath { get; set; }
 }

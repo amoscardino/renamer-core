@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 
-namespace RenamerCore.Models
+namespace RenamerCore.Models;
+
+public class MovieResponse
 {
-    public class MovieResponse
-    {
-        public List<Movie> Results { get; set; }
-    }
+    public List<Movie> Results { get; set; }
 }
