@@ -8,21 +8,14 @@ using McMaster.Extensions.CommandLineUtils;
 
 namespace RenamerCore.Services;
 
-public class FileService
+/// <summary>
+/// Creates a new instance of the File Service.
+/// </summary>
+/// <param name="console"></param>
+public class FileService(IConsole console)
 {
-    private readonly IConsole _console;
-
     /// <summary>
-    /// Creates a new instance of the File Service.
-    /// </summary>
-    /// <param name="console"></param>
-    public FileService(IConsole console)
-    {
-        _console = console;
-    }
-
-    /// <summary>
-    /// Retreives all files from a directory as FileMatch objects. The path for each file
+    /// Retrieves all files from a directory as FileMatch objects. The path for each file
     /// will be the OldPath value and NewPath will be null. Only traverses the files in
     /// the input directory unless the recurse flag is passed.
     /// </summary>
@@ -38,8 +31,8 @@ public class FileService
                 .OrderBy(match => match.OldPath)
                 .ToList();
 
-        _console.WriteLine($"Found {files.Count} files.");
-        _console.WriteLine();
+        console.WriteLine($"Found {files.Count} files.");
+        console.WriteLine();
 
         return files;
     }
@@ -61,6 +54,6 @@ public class FileService
             File.Move(file.OldPath, file.NewPath);
         }
 
-        _console.WriteLine($"Renamed {files.Count(match => !match.NewPath.IsNullOrWhiteSpace())} files.");
+        console.WriteLine($"Renamed {files.Count(match => !match.NewPath.IsNullOrWhiteSpace())} files.");
     }
 }

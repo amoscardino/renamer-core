@@ -11,20 +11,9 @@ using System.Text;
 
 namespace RenamerCore.Services;
 
-public class MovieRenamerService
+public class MovieRenamerService(IConsole console, FileService fileService, TheMovieDbApiService movieDbApiService)
 {
-    private readonly IConsole _console;
-    private readonly FileService _fileService;
-    private readonly TheMovieDbApiService _movieDbApiService;
-
     private bool _verbose;
-
-    public MovieRenamerService(IConsole console, FileService fileService, TheMovieDbApiService movieDbApiService)
-    {
-        _console = console;
-        _fileService = fileService;
-        _movieDbApiService = movieDbApiService;
-    }
 
     public async Task RenameAsync(string inputPath, string outputPath, bool skipConfirmation, bool verbose)
     {
@@ -35,18 +24,18 @@ public class MovieRenamerService
 
         if (!File.GetAttributes(inputPath).HasFlag(FileAttributes.Directory))
         {
-            _console.WriteLine("Input path must be a directory, not a file.");
+            console.WriteLine("Input path must be a directory, not a file.");
             return;
         }
 
         if (_verbose)
         {
-            _console.WriteLine($"* Using Input Path: {inputPath}");
-            _console.WriteLine($"* Using Output Path: {outputPath}");
-            _console.WriteLine();
+            console.WriteLine($"* Using Input Path: {inputPath}");
+            console.WriteLine($"* Using Output Path: {outputPath}");
+            console.WriteLine();
         }
 
-        var files = _fileService.GetFiles(inputPath);
+        var files = fileService.GetFiles(inputPath);
 
         if (!files.Any())
             return;
@@ -56,16 +45,16 @@ public class MovieRenamerService
         var anyToRename = files.Any(match => !match.NewPath.IsNullOrWhiteSpace());
 
         if (anyToRename && (skipConfirmation || Prompt.GetYesNo("Look good?", true)))
-            _fileService.RenameFiles(files);
+            fileService.RenameFiles(files);
         else
-            _console.WriteLine("Nothing has been changed.");
+            console.WriteLine("Nothing has been changed.");
     }
 
     private async Task MatchFilesAsync(List<FileMatch> files, string outputPath)
     {
         foreach (var file in files)
         {
-            _console.WriteLine($"{Path.GetFileName(file.OldPath)} =>");
+            console.WriteLine($"{Path.GetFileName(file.OldPath)} =>");
 
             var ext = Path.GetExtension(file.OldPath);
             var fileName = Path.GetFileNameWithoutExtension(file.OldPath);
@@ -74,7 +63,7 @@ public class MovieRenamerService
 
             if (movie == null)
             {
-                _console.WriteLine($"\tNO MATCH!");
+                console.WriteLine($"\tNO MATCH!");
                 continue;
             }
 
@@ -82,22 +71,22 @@ public class MovieRenamerService
 
             file.NewPath = Path.Combine(outputPath, newFileName);
 
-            _console.WriteLine($"\t{newFileName}");
-            _console.WriteLine();
+            console.WriteLine($"\t{newFileName}");
+            console.WriteLine();
         }
     }
 
     private async Task<Movie> FindMovieRecursiveAsync(string name)
     {
         if (_verbose)
-            _console.WriteLine($"\t\t* Searching for: \"{name}\"");
+            console.WriteLine($"\t\t* Searching for: \"{name}\"");
 
         if (name.IsNullOrWhiteSpace())
             return null;
 
         try
         {
-            var result = await _movieDbApiService.GetMovieAsync(name);
+            var result = await movieDbApiService.GetMovieAsync(name);
 
             if (result != null)
                 return result;

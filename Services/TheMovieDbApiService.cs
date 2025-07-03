@@ -6,20 +6,15 @@ using RenamerCore.Models;
 
 namespace RenamerCore.Services;
 
-public class TheMovieDbApiService
+/// <summary>
+/// Creates a new instance of The Movie DB API Service
+/// </summary>
+/// <param name="configService"></param>
+public class TheMovieDbApiService(ConfigService configService)
 {
     private const string API_URL = "https://api.themoviedb.org/3";
 
-    private readonly string _apiKey;
-
-    /// <summary>
-    /// Creates a new instance of The Movie DB API Service
-    /// </summary>
-    /// <param name="configService"></param>
-    public TheMovieDbApiService(ConfigService configService)
-    {
-        _apiKey = configService.GetValue("TheMovieDbApiKey");
-    }
+    private readonly string _apiKey = configService.GetValue("TheMovieDbApiKey");
 
     /// <summary>
     /// Searches The Movie DB for a movie by name.

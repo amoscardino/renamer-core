@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,22 +11,9 @@ using System.Text;
 
 namespace RenamerCore.Services;
 
-public partial class ShowRenamerService
+public partial class ShowRenamerService(IMemoryCache cache, IConsole console, FileService fileService, TheMovieDbApiService tmdbApiService)
 {
-    private readonly IMemoryCache _cache;
-    private readonly IConsole _console;
-    private readonly FileService _fileService;
-    private readonly TheMovieDbApiService _tmdbApiService;
-
     private bool _verbose;
-
-    public ShowRenamerService(IMemoryCache cache, IConsole console, FileService fileService, TheMovieDbApiService tmdbApiService)
-    {
-        _cache = cache;
-        _console = console;
-        _fileService = fileService;
-        _tmdbApiService = tmdbApiService;
-    }
 
     public async Task RenameAsync(string inputPath, string outputPath, bool filesOnly, bool recurse, bool skipConfirmation, bool verbose)
     {
@@ -38,20 +24,20 @@ public partial class ShowRenamerService
 
         if (!File.GetAttributes(inputPath).HasFlag(FileAttributes.Directory))
         {
-            _console.WriteLine("Input path must be a directory, not a file.");
+            console.WriteLine("Input path must be a directory, not a file.");
             return;
         }
 
         if (_verbose)
         {
-            _console.WriteLine($"* Using Input Path: {inputPath}");
-            _console.WriteLine($"* Using Output Path: {outputPath}");
-            _console.WriteLine();
+            console.WriteLine($"* Using Input Path: {inputPath}");
+            console.WriteLine($"* Using Output Path: {outputPath}");
+            console.WriteLine();
         }
 
-        var files = _fileService.GetFiles(inputPath, recurse);
+        var files = fileService.GetFiles(inputPath, recurse);
 
-        if (!files.Any())
+        if (files.Count == 0)
             return;
 
         await MatchFilesAsync(files, outputPath, filesOnly);
@@ -59,16 +45,16 @@ public partial class ShowRenamerService
         var anyToRename = files.Any(match => !match.NewPath.IsNullOrWhiteSpace());
 
         if (anyToRename && (skipConfirmation || Prompt.GetYesNo("Look good?", true)))
-            _fileService.RenameFiles(files);
+            fileService.RenameFiles(files);
         else
-            _console.WriteLine("Nothing has been changed.");
+            console.WriteLine("Nothing has been changed.");
     }
 
     private async Task MatchFilesAsync(List<FileMatch> files, string outputPath, bool filesOnly)
     {
         foreach (var file in files)
         {
-            _console.WriteLine($"{Path.GetFileName(file.OldPath)} =>");
+            console.WriteLine($"{Path.GetFileName(file.OldPath)} =>");
 
             var fileName = Path.GetFileNameWithoutExtension(file.OldPath);
             var ext = Path.GetExtension(file.OldPath);
@@ -76,7 +62,7 @@ public partial class ShowRenamerService
 
             if (!regexMatch.Success)
             {
-                _console.WriteLine($"\tUnable to parse file name.");
+                console.WriteLine($"\tUnable to parse file name.");
                 continue;
             }
 
@@ -98,8 +84,8 @@ public partial class ShowRenamerService
 
             if (show == null)
             {
-                _console.WriteLine($"\tNO MATCH!");
-                _console.WriteLine();
+                console.WriteLine($"\tNO MATCH!");
+                console.WriteLine();
                 continue;
             }
 
@@ -110,8 +96,8 @@ public partial class ShowRenamerService
 
             if (startEpisode == null)
             {
-                _console.WriteLine($"\tNO MATCH!");
-                _console.WriteLine();
+                console.WriteLine($"\tNO MATCH!");
+                console.WriteLine();
                 continue;
             }
 
@@ -123,8 +109,8 @@ public partial class ShowRenamerService
 
                 if (endEpisode == null)
                 {
-                    _console.WriteLine($"\tNO MATCH!");
-                    _console.WriteLine();
+                    console.WriteLine($"\tNO MATCH!");
+                    console.WriteLine();
                     continue;
                 }
             }
@@ -133,8 +119,8 @@ public partial class ShowRenamerService
 
             file.NewPath = Path.Combine(outputPath, newfilePath);
 
-            _console.WriteLine($"\t{newfilePath}");
-            _console.WriteLine();
+            console.WriteLine($"\t{newfilePath}");
+            console.WriteLine();
         }
     }
 
@@ -144,21 +130,21 @@ public partial class ShowRenamerService
             return null;
 
         if (_verbose)
-            _console.WriteLine($"\t\t* Searching for ID: \"{id}\"");
+            console.WriteLine($"\t\t* Searching for ID: \"{id}\"");
 
         var show = (Show)null;
         var cacheKey = $"TmdbShowId-{id}";
 
-        if (!_cache.TryGetValue(cacheKey, out show))
+        if (!cache.TryGetValue(cacheKey, out show))
         {
             try
             {
-                show = await _tmdbApiService.GetShowByIdAsync(id);
+                show = await tmdbApiService.GetShowByIdAsync(id);
             }
             catch { }
 
             if (show != null)
-                _cache.Set(cacheKey, show);
+                cache.Set(cacheKey, show);
         }
 
         return show;
@@ -170,21 +156,21 @@ public partial class ShowRenamerService
             return null;
 
         if (_verbose)
-            _console.WriteLine($"\t\t* Searching for: \"{name}\"");
+            console.WriteLine($"\t\t* Searching for: \"{name}\"");
 
         var show = (Show)null;
         var cacheKey = $"TmdbShow-{name}";
 
-        if (!_cache.TryGetValue(cacheKey, out show))
+        if (!cache.TryGetValue(cacheKey, out show))
         {
             try
             {
-                show = await _tmdbApiService.GetShowAsync(name);
+                show = await tmdbApiService.GetShowAsync(name);
             }
             catch { }
 
             if (show != null)
-                _cache.Set(cacheKey, show);
+                cache.Set(cacheKey, show);
         }
 
         return show ?? await FindShowByNameAsync(name.DropLastWord());
@@ -195,9 +181,9 @@ public partial class ShowRenamerService
         try
         {
             if (_verbose)
-                _console.WriteLine($"\t\t* Searching for: Show: {showId}, Season: {season}, Episode: {episode}.");
+                console.WriteLine($"\t\t* Searching for: Show: {showId}, Season: {season}, Episode: {episode}.");
 
-            return await _tmdbApiService.GetEpisodeAsync(showId, season, episode);
+            return await tmdbApiService.GetEpisodeAsync(showId, season, episode);
         }
         catch
         {
@@ -234,6 +220,9 @@ public partial class ShowRenamerService
             sb.Append(" - ");
             sb.Append(endEpisode.Name);
         }
+
+        if (Regex.IsMatch(ext, @"srt|sub", RegexOptions.IgnoreCase))
+            sb.Append(".en");
 
         sb.Append(ext);
 
