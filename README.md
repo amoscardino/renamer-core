@@ -5,7 +5,7 @@ Command line tool to rename movie and show files for Plex.
 
 ## Installation
 
-> Requires [.NET 6](https://dotnet.microsoft.com)
+> Requires [.NET 10](https://dotnet.microsoft.com)
 
 Clone the repo to you computer. Pull to get updates. Open a command prompt to the source directory.
 
@@ -48,6 +48,8 @@ The Movie Renamer looks for any files in the input directly, runs them through a
 For instance, given a file called `star.wars.1977.h264.foo.bar.mkv`, it will match against The Movie DB and rename the file to `Star Wars (1977).mkv`. Special tags will be added for 4k and 1080p movies if the original file name indicates the resolution. Subtitle files (`srt` and `sub` extensions) are treated as English, and `.en` will be inserted before the extension.
 
 > New in 3.2: If the movie year prefixes the title, the year will be dropped before searching.
+
+> New in 5.0: Movie files are now put into folders! So ``star.wars.1977.h264.foo.bar.mkv` now becomes `Star Wars (1977)/Star Wars (1977).mkv`. Subtitles will be put in the same folder as the main movie file.
 
 #### Movie Renamer Options
 

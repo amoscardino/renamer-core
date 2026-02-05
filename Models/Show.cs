@@ -1,5 +1,5 @@
 using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace RenamerCore.Models;
 
@@ -9,6 +9,6 @@ public class Show
 
     public string Name { get; set; }
 
-    [JsonProperty("first_air_date")]
+    [JsonPropertyName("first_air_date")]
     public DateTime? FirstAirDate { get; set; }
 }

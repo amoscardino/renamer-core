@@ -1,5 +1,5 @@
 using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace RenamerCore.Models;
 
@@ -9,6 +9,6 @@ public class Movie
 
     public string Title { get; set; }
 
-    [JsonProperty("release_date")]
+    [JsonPropertyName("release_date")]
     public DateTime ReleaseDate { get; set; }
 }

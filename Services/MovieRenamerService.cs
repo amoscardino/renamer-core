@@ -67,11 +67,12 @@ public class MovieRenamerService(IConsole console, FileService fileService, TheM
                 continue;
             }
 
+            var newFolderName = GetNewFolderName(movie);
             var newFileName = GetNewFileName(movie, fileName, ext);
 
-            file.NewPath = Path.Combine(outputPath, newFileName);
+            file.NewPath = Path.Combine(outputPath, newFolderName, newFileName);
 
-            console.WriteLine($"\t{newFileName}");
+            console.WriteLine($"\t{Path.Combine(newFolderName, newFileName)}");
             console.WriteLine();
         }
     }
@@ -102,8 +103,7 @@ public class MovieRenamerService(IConsole console, FileService fileService, TheM
     private string GetNewFileName(Movie movie, string oldFileName, string ext)
     {
         var sb = new StringBuilder();
-        sb.Append(movie.Title);
-        sb.AppendFormat(" ({0})", movie.ReleaseDate.Year);
+        sb.Append(GetNewFolderName(movie));
 
         if (Regex.IsMatch(oldFileName, @"4k|2160|uhd", RegexOptions.IgnoreCase))
             sb.Append(" - 4k");
@@ -115,6 +115,15 @@ public class MovieRenamerService(IConsole console, FileService fileService, TheM
             sb.Append(".en");
 
         sb.Append(ext);
+
+        return sb.ToString().CleanFileName();
+    }
+
+    private string GetNewFolderName(Movie movie)
+    {
+        var sb = new StringBuilder();
+        sb.Append(movie.Title);
+        sb.AppendFormat(" ({0})", movie.ReleaseDate.Year);
 
         return sb.ToString().CleanFileName();
     }

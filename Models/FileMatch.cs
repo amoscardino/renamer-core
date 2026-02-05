@@ -1,4 +1,3 @@
-
 namespace RenamerCore.Models;
 
 public class FileMatch
