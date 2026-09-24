@@ -58,7 +58,7 @@ public partial class ShowRenamerService(IMemoryCache cache, IConsole console, Fi
 
             var fileName = Path.GetFileNameWithoutExtension(file.OldPath);
             var ext = Path.GetExtension(file.OldPath);
-            var regexMatch = Regex.Match(fileName, @"(?:\[{2}(\d+)\]{2})?(.+?)s?(\d+)[ex](\d+)[ex-]{0,2}(\d+)?", RegexOptions.IgnoreCase);
+            var regexMatch = FileNameRegex().Match(fileName);
 
             if (!regexMatch.Success)
             {
@@ -68,16 +68,16 @@ public partial class ShowRenamerService(IMemoryCache cache, IConsole console, Fi
 
             var show = (Show)null;
 
-            if (regexMatch.Groups[1].Success)
+            if (regexMatch.Groups["id"].Success)
             {
-                var showId = int.TryParse(regexMatch.Groups[1].Value, out var id) ? id : 0;
+                var showId = int.TryParse(regexMatch.Groups["id"].Value, out var id) ? id : 0;
 
                 show = await FindShowByIdAsync(showId);
             }
 
             if (show == null)
             {
-                var showName = regexMatch.Groups[2].Value.Clean();
+                var showName = regexMatch.Groups["name"].Value.Clean();
 
                 show = await FindShowByNameAsync(showName);
             }
@@ -89,8 +89,8 @@ public partial class ShowRenamerService(IMemoryCache cache, IConsole console, Fi
                 continue;
             }
 
-            var seasonNumber = int.TryParse(regexMatch.Groups[3].Value, out var s) ? s : 0;
-            var startEpisodeNumber = int.TryParse(regexMatch.Groups[4].Value, out var e) ? e : 0;
+            var seasonNumber = int.TryParse(regexMatch.Groups["season"].Value, out var s) ? s : 0;
+            var startEpisodeNumber = int.TryParse(regexMatch.Groups["start"].Value, out var e) ? e : 0;
             var startEpisode = await FindEpisodeAsync(show.Id, seasonNumber, startEpisodeNumber);
             var endEpisode = (Episode)null;
 
@@ -101,9 +101,9 @@ public partial class ShowRenamerService(IMemoryCache cache, IConsole console, Fi
                 continue;
             }
 
-            if (regexMatch.Groups[5].Success)
+            if (regexMatch.Groups["end"].Success)
             {
-                var endEpisodeNumber = int.TryParse(regexMatch.Groups[5].Value, out var e1) ? e1 : 0;
+                var endEpisodeNumber = int.TryParse(regexMatch.Groups["end"].Value, out var e1) ? e1 : 0;
 
                 endEpisode = await FindEpisodeAsync(show.Id, seasonNumber, endEpisodeNumber);
 
@@ -123,6 +123,10 @@ public partial class ShowRenamerService(IMemoryCache cache, IConsole console, Fi
             console.WriteLine();
         }
     }
+
+    // Matches "[[id]]Show Name s01e02", "Show Name 1x02", "Show Name s01e02-e03", and "Show Name Season 1, Episode 2"
+    [GeneratedRegex(@"(?:\[{2}(?<id>\d+)\]{2})?(?<name>.+?)(?:season[\s._-]*(?<season>\d+)[\s._-]*,?[\s._-]*episode[\s._-]*(?<start>\d+)|s?(?<season>\d+)[ex](?<start>\d+)[ex-]{0,2}(?<end>\d+)?)", RegexOptions.IgnoreCase)]
+    private static partial Regex FileNameRegex();
 
     private async Task<Show> FindShowByIdAsync(int id)
     {

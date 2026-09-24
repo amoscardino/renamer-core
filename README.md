@@ -67,7 +67,7 @@ renamer s [OPTIONS]
 
 The Show Renamer looks for any files in the input directly, attempts to match the show/season/episode to The Movie DB, then moves the files to a folder structure that Plex likes.
 
-For instance, given a file called `doctor.who.2005.s01e01.mkv`, it will be moved to `Doctor Who (2005)\Season 01\Doctor Who (2005) - s01e01 - Rose.mkv`. In order for the episode to be matched correctly, the season and episode must be in the file name using `sXXeYY` or `YYxZZ`. Any text before the season/episode info is considered to be the show name and is searched against The Movie DB using a similar algorithm to the movie renamer.
+For instance, given a file called `doctor.who.2005.s01e01.mkv`, it will be moved to `Doctor Who (2005)\Season 01\Doctor Who (2005) - s01e01 - Rose.mkv`. In order for the episode to be matched correctly, the season and episode must be in the file name using `sXXeYY`, `YYxZZ`, or `Season X, Episode Y` (the comma is optional). Any text before the season/episode info is considered to be the show name and is searched against The Movie DB using a similar algorithm to the movie renamer.
 
 > NEW! In 2.4+, you can now prepend the show ID from The Movie DB to the beginning of the filename. Wrap it in double-square brackets to override the show name search. For example, you can name the file something like `[[12345]]some.show.name.s01e01.mkv` to have the show matched directly based on the ID `12345`.
 
